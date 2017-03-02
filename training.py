@@ -1,8 +1,10 @@
+import os
 import csv
 import cv2
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
+import sklearn
 
 lines = []
 with open('./data/driving_log.csv') as csvfile:
@@ -12,7 +14,7 @@ with open('./data/driving_log.csv') as csvfile:
 
 images = []
 measurements = []
-for line in lines:
+for line in lines[0:7000]:
 	for i in range(3):
 		source_path = line[i]
 		filename = source_path.split('/')[-1]
@@ -53,11 +55,14 @@ model.add(Convolution2D(64,3,3,activation="relu"))
 model.add(Convolution2D(64,3,3,activation="relu"))
 model.add(Flatten())
 model.add(Dense(100))
+model.add(Dropout(0.9))
 model.add(Dense(50))
+model.add(Dropout(0.9))
 model.add(Dense(10))
+model.add(Dropout(0.9))
 model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=50)
+model.fit(X_train, y_train, batch_size=512, validation_split=0.2, shuffle=True, nb_epoch=100)
 model.save('model.h5')
 exit()
